@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Building an Agentic RAG Application, a startup POC"
-date:   2024-08-20 14:49:10 +0300
+date:   2024-08-29 14:49:10 +0300
 categories: blog 
 tags: llms llm 
 ---
