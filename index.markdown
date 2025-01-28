@@ -12,7 +12,7 @@ layout: post
     I'm Burak, ML lover/researcher/engineer dating back to 2017, with nearly four years spent on Healthcare AI. Not claiming I'm perfect on all, but I have put a lot of effort into each of them at different eras. Mostly in CV but now switching to LLMs.
      </p>
       <p>
-    Lately, I'm providing consultancy services for startups, and I've had several attempts at founding as well. Previously, I've leveraged <a href="https://gesund.ai" target="_blank">GesundAI</a> to CB Insights AI 100 as its first engineer and learned tons of startup skills (how to build/design a product, lead a business contract, being a 10x engineer). 
+    Currently, I'm working as LLM Engineer at Career.io. Lately, I was providing consultancy services for startups, and I've had several attempts at founding as well. Previously, I've leveraged <a href="https://gesund.ai" target="_blank">GesundAI</a> to CB Insights AI 100 as its first engineer and learned tons of startup skills (how to build/design a product, lead a business contract, being a 10x engineer). 
    </p>
 
  <p>
