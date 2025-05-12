@@ -5,7 +5,11 @@ date:   2025-05-07 00:00:10 +0300
 categories: blog 
 ---
 
-I'll use any resource that helps me to prepare faster and I'll cite it all.
+- I'll use any resource that helps me to prepare faster.
+- I'm not directly working for interviews, but preparing for them makes me learn so many stuff, for years(check main page of website for 8 yo youtube channel).
+- I'll cite every content I use. 
+- I'll agressively reference anything I believe explained things better than me.
+
 
 ## Vector DBs
 
@@ -178,13 +182,12 @@ Most of the cases, user may not need all documents or the most similar document,
 **Cons**:  
 Decrease in accuracy. Index building can be costly.
 
-####  Tree-based Methods
+
+#### 3. Tree based Solutions like KD Tree (K-Dimensional Tree)
 
 Examples: KD-Tree, Ball Tree, Annoy (from Spotify).
 Pros: Good for low-dimensional data.
 Cons: Perform poorly in high dimensions (>100).
-
-#### 3. Tree based Solutions like KD Tree (K-Dimensional Tree)
 
 If you have worked with decision trees, limitations will hear you.
 
@@ -201,7 +204,6 @@ KD Tree is a binary tree used for organizing points in a k-dimensional space. It
 
 ---
 
-##### Verbal Explanation
 
 Imagine our leg-based animal dataset again:
 
@@ -259,7 +261,7 @@ During search, it computes whether a ball can be ignored based on the query poin
 
 ---
 
-##### Verbal Explanation
+
 
 Using our same dataset:
 
@@ -284,6 +286,8 @@ We only need to explore Ball A. Less work than exhaustive search.
 #### 5. Tree based Solutions like  Annoy (Approximate Nearest Neighbors Oh Yeah)
 
 **Method**:  
+If you have used/learned XGBoost, LightGBM, Random Forests, its exactly the same idea. Method gets its power by so many shallow trees. Pros and Cons are also very similar.
+
 Annoy builds **multiple trees** where each tree is built using random hyperplane projections. At each node, it picks two random points, draws a hyperplane equidistant between them, and splits the data.
 
 During search, it searches across many such trees and aggregates the results.
@@ -300,7 +304,7 @@ During search, it searches across many such trees and aggregates the results.
 
 ---
 
-##### Verbal Explanation
+
 
 Imagine again our dataset:
 
@@ -349,9 +353,7 @@ Needs many hash tables for good accuracy.
 Can consume a lot of memory with large datasets.
 
 
-
-
-### 4. How does clustering reduce search space? When does it fail and how can we mitigate these failures?
+### 4. How does clustering reduce search space? When does it fail and how can we mitigate these failures?
 
 - It reduces search space by not trying to find distance on all vectors, but trying to find closest cluster first, then calculating distance on the vectors of closest cluster. Ball-Tree method is a good example for that.
   
@@ -360,12 +362,106 @@ Can consume a lot of memory with large datasets.
 1. Embedding is poorly chosen. 
 2. In high dimensions, (means embedding creates [1,100] for query rather than [1,10] let's say), clustering becomes meaningless and less quality. We may need to reduce dimensionality.
 
-### 5. Explain Locality-sensitive hashing (LHS) indexing method?
+#### 4.1 Estimate RAM/Memory Needs of Such Database (without Any Compression)
+
+[Pinecone](https://www.pinecone.io/learn/series/faiss/product-quantization/) has a great explaining why do we have indexing methods.
+
+*Vector similarity search can require huge amounts of memory. Indexes containing 1M dense vectors (a small dataset in today’s world) will often require several GBs of memory to store.*
+*The problem of excessive memory usage is exasperated by high-dimensional data, and with ever-increasing dataset sizes, this can very quickly become unmanageable.*
+
+Let's estimate the Size of 1 Million 1-page pdf DB
+
+Referencing the numbers from [here](https://huggingface.co/blog/getting-started-with-embeddings), also mostly used in vector database tutorials, let's assume we embed with "all-MiniLM-L6-v2". This model outputs the size of (1,384) float32 array.
+
+Standard A4 page contains 500 words, assume we chunk per half-page. Float32 is 4 bytes. 384 floats per embedding * 4 bytes * 2 chunk per page * 1,000,000 documents = 3 GB. 
+
+If we are ok to use float16 precision, which is possible, then it's only 1.5 GBs.
+
+Or, if you wanna go with "text-embedding-ada-002" from OpenAI because you think search quality is better, it has 1536 float32's in its vector, with same chunking strategy (although you may want to experiment with chunk size), it would be 15 GBish.
+
+In order to reduce the memory usage and performantly query the DB, we should reduce the size but minimally loss search-retrieval performance. There are ways of it.
+
+
+
+### 5. Explain product quantization (PQ) indexing method?
+
+ Again from Pinecone. 
+ 
+* Product quantization (PQ) is a popular method for dramatically compressing high-dimensional vectors to use 97% less memory, and for making nearest-neighbor search speeds 5.5x faster in our tests.*
+
+And, although I'll cite, summarise and use the images from amazing blog of  [Vyacheslav Efimos](https://towardsdatascience.com/similarity-search-product-quantization-b2a1a6397701/), for better understanding please read it.
+
+
+When I've read about PQ, I remembered the days where I was 7-zipping the rar folder I've saved game setup to my 1 GB Toshiba USB at 2009. 
+
+
+| ![Image](https://towardsdatascience.com/wp-content/uploads/2023/05/198eO9hCC3Wzp8AURuZT-NA.png "Embedding on 2D"){: width="90%" style="display:block; margin-left:auto; margin-right:auto"}| 
+|:--:| 
+| [Resource](https://towardsdatascience.com/similarity-search-product-quantization-b2a1a6397701/) 
+ |    
+
+
+As you remember, we embedded with **"all-MiniLM-L6-v2"** that outputs to a `(1, 384)` **float32 array**.
+
+But assume we have an algorithm that embeds to `(1, 8)` per chunk, in **binary values** like:
+[0,1,0,1,1,1,0,1]
+
+This means we can have **2⁸ = 256 possible vectors**.
+
+Let's simplify the **LOGIC**, not yet the exact algorithm, just the basic idea:
+
+- Step 1: Divide the vector into **subvectors**.
+Let's divide the vector into **4 subvectors**:
+[0,1] [0,1] [1,1] [0,1]
+
+
+- Step 2: Assign unique identifiers to each subvector.
+Instead of storing these **subvectors** directly, we can represent them with unique integer identifiers:
+- `[0,0] -> 0`
+- `[0,1] -> 1`
+- `[1,0] -> 2`
+- `[1,1] -> 3`
+
+- Step 3: Embed the vector using the identifiers.
+
+Thus, the vector can be **embedded** as:
+"1131"
+
+Where:
+- `1` refers to the second subvector `[0,1]`
+- `3` refers to the fourth subvector `[0,1]`
+
+
+Instead of storing the 256 possible vectors in 8 integers, we now only store them in **4 integers**. Even in this small example we reduced to %50.
+
+And during the similarity search,
+
+- Step 1: Let's say we want to query [0,1,0,1,1,1,1,1], it's 1133. 
+- Step 2: Calculate distance on the PQ values. (1-1)^2+(1-1)^2+(3-3)^2+(3-1)^2=4. So again we find a similar chunk. However, this time we did 4 operations instead of 8.
+
+
+PQ works similar way, the differences are:
+- Embedding size is huge like  `(1, 384)` and float, so we cant find exact clusters like `[0,1]`.
+- Rather we estimate clusters, with cluster algorithms. For each cluster, we assign integer as we do above. 
+- Since clusters are not exact representation of the data we have, it's a lossy compression. But it's OK because we try to rank/get least distanced samples with query. 
+
+Referencing to [Vyacheslav Efimos](https://towardsdatascience.com/similarity-search-product-quantization-b2a1a6397701/)'s blog, 
+
+- Imagine an original vector of size 384, which stores floats (32 bits), was divided into n = 8 subvectors 
+- where each subvector is encoded by one of k = 256 clusters. 
+- Therefore, encoding the ID of a single cluster would require log₂(256) = 8 bits. 
+- Let us compare the memory sizes for the vector representation in both cases: 
+- Original vector: 384 * 32 bits = 12,288 bytes. 
+- Encoded vector: 8 * 8 bits = 8 bytes. 
+- The final compression is 1536 times! This is the real power of product quantization.
+
+
+
+
+### 6. Explain Locality-sensitive hashing (LHS) indexing method?
 
 TBC.
 
-### 6. Explain product quantization (PQ) indexing method?
-TBC.
 
 
 ### 7. Compare different Vector index and given a scenario, which vector index you would use for a project?
@@ -383,3 +479,16 @@ Dedicated Vector Databases: Pinecone, Milvus, Qdrant, Weaviate, Chroma, Vespa, V
 Vector Search Capabilities in General-Purpose Databases: PostgreSQL with pgvector, MongoDB Atlas, Elasticsearch, OpenSearch, Apache Cassandra, Redis Stack, SingleStoreDB, Oracle Database, MySQL, MariaDB, Supabase, ClickHouse.
 
 Vector Search Libraries: Faiss, ScaNN, Annoy.
+
+
+
+
+
+
+
+Side Notes:
+- %90 of the blog is/will be written by me.
+- I may use ChatGPT to create %10 of the blogs, just to make content easier to read/to markdown format the algorithms. But nothing more than this. Just for help.
+- This doesn't mean I create posts with ChatGPT, and proof-read and additions. It means I create posts by myself, in the middle I found ChatGPT can graph/format algorithm better than me, and prompt what I want to explain to it. Then it gives better format/fun to read content for just *some* part of the blog.
+- The reason is, I already spend time to create content, and I'm learning while writing, but I understand content before writing, so I want to minimize writing time. 
+
