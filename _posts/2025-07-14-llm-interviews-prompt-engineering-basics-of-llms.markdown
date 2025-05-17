@@ -328,11 +328,172 @@ But in practise:
 
 ### 5. Explain the basic structure of prompt engineering
 
-TBC.
+Note : I may need to add more content to this section.
+
+[Read everything here to master](https://www.reddit.com/r/PromptEngineering/comments/18hhvi3/resources_that_dramatically_improved_my_prompting/)
+
+Before diving in depth, the structure below for me has been very beneficial on my 5k MAU app, and 2 POCs. Although you may have seen the illustration before and say "another AI Influencer's content", think twice.
+
+| ![Image](https://learnprompting.org/docs/assets/basics/formal_prompt.svg "Very Useful Prompting Structure"){: width="50%" style="display:block; margin-left:auto; margin-right:auto"}| 
+|:--:| 
+| [learnprompting.org](https://learnprompting.org/docs/basics/prompt_structure/) 
+ |    
+
+The structure above we'll discuss now is actually mostly used for apps that user expect to get single answer, non-conversational one.:
+- Generate interview questions in some rule. -> Question is given to you and that's it.
+- Summarize the content with the neutral tone. -> Content is summarised and is given to you.
+
+However, if you are developing a conversational app, you should consider:
+- Rules are tend to be forgiven when number of messages increases.
+- Users can try to jailbreak-hijack.
+- If conversation takes long (generally happens when you paste some text/document to conversations), you are exceeding the context lenght of the model and your "command prompts" at the beginning are excluded to fit into the context lenght within the FIFO (First in First Out) principle.
+
+Let's go for the cases mentioned, illustration is very helpful. 
+
+#### 5.1 Role Prompting
+
+Role is to define what should AI consider itself while responding to you. It can either be historian, or a harsh interviewer that asks hard questions, or a kind call-person. 
+
+! Never forget, it's the first thing your AI reads! Although in practise, you may see that commanding in random places still works, it's proven that where you command/type important context is important.  
+
+[Lost in the Middle: How Language Models Use Long Contexts](https://arxiv.org/pdf/2307.03172) [and a good summary of paper](https://medium.com/@carolzhu/lost-in-the-middle-how-language-models-use-long-contexts-2891830f8000)
+
+[LLMs Get Lost in Multi-turn Conversation](https://arxiv.org/abs/2505.06120)  [and a good summary of paper](https://www.linkedin.com/posts/bostjankaluza_ai-llms-promptengineering-activity-7328696089295896578-QaY7?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAAB8CcdUBI21WSuAugHohPQGyOcI392dN1oA)
+
+
+Defining the role/mood of your AI would prepare it to style/how to think about the subject.
+
+Let's see this on qwen:1-7B
+
+> USER: you are expert interviewer. what would you ask to product manager in interview?
+
+> ASSISTANT: <think> Okay, I need to figure out what questions an expert interviewer would ask a product manager during an interview. Let me start by recalling what I know about  product management interviews. Product managers are responsible for defining product goals, managing the product lifecycle, and ensuring alignment ....so many things... First, I should consider the different aspects of a product manager's role....* I remember that interviews often start with a greeting and an introduction. * ...</think> 
+
+>ASSISTANT: Hi, welcome to the interview.....
+
+In the middle of thinking, AI realised that expert interviews greet people.
+
+While if you do not assign role by saying * you are expert interviewer *, AI jumps directly to the question:
+
+> ASSISTANT: <think> ... For example, instead of "What do you think about product management?" they should ask "How do you approach defining the product strategy for a new feature?" ...</think> 
+
+So, in the first paragraph, you should define the sufficient:
+
+- Role
+- Mindset
+- Tone
+- Style
+- Behavior
+- Goal
+- Audience  
+- Constraints 
+
+#### 5.2 Instruction Prompt
+
+You've assigned the role to the AI, then you should constraint it to focus on specific task within its responsibility.
+
+In this section, you should be specific and command AI what to do, directly starting with: 
+*Specify, Summarize, Translate, Do, Classify, Divide, Distinguish* 
+
+Then, you should continue with the action point in general.
+
+> USER: Translate the given text in Turkish, considering the localisation of the synonyms in the Turkish language, as if the direct translation of synonyms are meaningful for the target language. 
+
+You should also consider markdown tags while defining the rules, it has been observed it works:
+
+> ## General Rules
+> - Try to match with the same number of words as the translation shouldn't increase the number of pages.
+> ## Avoid
+> - Never translate technical words in article, duckDB is not ordekDB in Turkish!
+
+
+#### 5.3 Defining Examples
+
+I've built 3 big apps with LLMs and RAG. I can assure you that good examples are 10 times better than long instruction prompting. Whatever you define in instructions, after some context AI either won't follow it or get bogged down in details. Good examples would even work even if you don't have any instruction prompt. 
+
+You need to define good examples on:
+- What to do (that's for sure)
+- What NOT to do 
+
+Like 
+
+```
+### ✅ Good Example:
+Q: Can you explain self-attention in Transformers?
+A: Sure! Think of each word looking at every other word and asking: “Should I care about you?”...
+
+### ❌ Bad Example:
+A: Self-attention is a mechanism that allows each token to... [copy-pasted Wikipedia-level dump]...
+
+```
+
+If you would like to get a json output, by using ==JSON Mode== or ==Structured Outputs==, you should define the response format in prompt:
+
+```
+{
+  "title": "The Rise of Transformers in NLP",
+  "author": "Jane Doe",
+  "main_points": [
+    "Transformers revolutionized NLP by using self-attention.",
+    "They enable parallel processing of tokens.",
+    "They have become the backbone of modern language models."
+  ]
+}
+```
+or 
+
+```
+{
+  "title": str title of movie,
+  "author": str author,
+  "main_points": List of str of 3-4 words explanation of main points
+}
+```
+
+or 
+
+in OpenAI python:
+
+```python
+from pydantic import BaseModel, Field
+
+class MovieSummary(BaseModel):
+    title: str = Field(..., description="Title of the movie")
+    author: str = Field(..., description="Author of the movie or article")
+    main_points: List[str] = Field(
+        ...,
+        description="List of main points (each 3-4 words) summarizing the content"
+    )
+```
+
+OpenAI reads descriptions from here, too! I've benefited a lot.
 
 ### 6. Explain in-context learning
 
-TBC.
+[Language Models are Few-Shot Learners](https://arxiv.org/abs/2005.14165)
+
+AI can't be trained with the fresh data everyday. It's just impossible. But AI has its intelligence, so that it can interpret the given data. *RAG*, retrieval augmented generation uses the principle that pipelines bring data to the prompt, so that your AI being informed about it. 
+
+```
+Continue the following story fragment in the style of Shakespearean English:
+
+Story start: "The sun dipped below the horizon, casting a golden glow on the ancient castle."
+
+Continuation:
+Lo, the amber light did kiss yon aged stones,
+Where whispered secrets dwell in shadowed tones.
+```
+
+Then, AI will follow what you've trained.
+
+! TBH I am ashamed to explain this, nowadays we need to know these gatekeeping names unfortunately :/
+
+What distinguish the ICL? 
+
+- No Parameter Updates: The model’s weights remain fixed; learning happens through the prompt context alone.
+- Transient Knowledge: The knowledge gained is temporary and specific to the current prompt; it is not stored permanently.
+- Few-Shot Learning: Often called few-shot or few-shot prompting, as the model requires only a handful of examples to generalize the task.
+- Leverages Pretraining: Better model, better ICL.
 
 ### 7. Explain types of prompt engineering
 
