@@ -49,6 +49,20 @@ Token is the piece of minimum/sufficiently information-encapsulating representat
 
 Based on the size of the training data, the number of tokens can number in the billions or trillions — and, per the pretraining scaling law, [the more tokens used for training](https://blogs.nvidia.com/blog/ai-tokens-explained/), the better the quality of the AI model.
 
+--- 
+Side Note on Number of Tokens in Famous Models
+
+According to the Chinchilla scaling law and related research, the optimal number of training tokens is roughly 20 times the number of model parameters. For example:
+
+- A 5 billion parameter model is trained on about 1 trillion tokens.
+- A 9 billion parameter model is trained on about 2.1 trillion tokens.
+- A 3 billion parameter model is trained on about 2.8 trillion tokens.
+- A 6 billion parameter model is trained on over 6.1 trillion tokens.
+- Larger models with tens of billions of parameters may be trained on tens of trillions of tokens (e.g., 20B parameters on 60+ trillion tokens) [Great Resource on this](https://www.harmdevries.com/post/model-size-vs-compute-overhead/) and [another](https://medium.com/@raniahossam/chinchilla-scaling-laws-for-large-language-models-llms-40c434e4e1c1)
+---
+
+
+
 | ![Image](https://cdn.prod.website-files.com/61e7d259b7746e3f63f0b6be/6630e466c569a5f73cd81c9e_Understanding%20LLM%20Billing_%20From%20Characters%20to%20Tokens-p-2000.jpg "Tokenization"){: width="90%" style="display:block; margin-left:auto; margin-right:auto"}| 
 |:--:| 
 | [Resource from Eden AI, LLM Billing](https://www.edenai.co/post/understanding-llm-billing-from-characters-to-tokens/) 
