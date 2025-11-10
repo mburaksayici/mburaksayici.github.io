@@ -971,3 +971,29 @@ The amount that we prepare data is hard to justify, so I'm not including that.
 #### Efficiency Comparison: Hit Rate vs Compute Time (Scatter Plot)
 
 ![Image](/assets/images/output_85_0.png ){: width="100%" style="display:block; margin-left:auto; margin-right:auto"}| 
+
+### Why Semantic Chunking May Not Work
+
+1. It didnt improve much for the dataset I work with. 
+2. It may have worked on a larger docs, but I have suspicions since [Is Semantic Chunking Worth the Computational Cost?](https://arxiv.org/pdf/2410.13070) paper couldn't see consistent performance improvements.
+
+Theoretically:
+1. Possibly, embedding model is good enough to separate context. If you think on it, semantic chunking is grouping the text, and its few sentences more and few sentences less, embedding model will still run through all tokens and pool semantics into a meaningful vector. 
+2. Context changes are session based, in the dataset within the same pdf chunks are already semantically similar.
+3. May be, embedding models are still good separator that can distinguish contextual differences within the single document.
+
+Even if you have a large documents it may still not work because: 
+1. Context of the paragraphs may have not change within the embedding size limits. 
+2. If you are able to AutoMergingRetrieval, you can still get relevant documents by huge performance gains with no effort.
+
+
+
+### Why Proposition Models May Not Work
+
+Again,
+1. It didnt improve much for the dataset I work with. 
+2. It may result in performance gain in subject/nouns heavy dataset. I assumed it's case for legal documents.
+3. However, although there are subject/nouns in the dataset, chunks are still discriminatory enough.
+
+
+However, in critical cases that LLM Engineer wants to mention names in every chunk, and within queries if those subject/nouns are heavily employed, one can definitely benefit this approach.  
