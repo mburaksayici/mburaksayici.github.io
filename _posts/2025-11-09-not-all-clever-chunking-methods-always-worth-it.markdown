@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Clever Chunking Models Aren’t (Always) Worth the Effort"
-date:   2025-11-10 00:00:00 +0300
+date:   2025-11-09 00:00:00 +0300
 categories: blog 
 ---
 
