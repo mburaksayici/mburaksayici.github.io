@@ -972,7 +972,7 @@ The amount that we prepare data is hard to justify, so I'm not including that.
 
 ![Image](/assets/images/output_85_0.png ){: width="100%" style="display:block; margin-left:auto; margin-right:auto"}| 
 
-### Why Semantic Chunking May Not Work
+### Why Semantic Chunking May Not Improve Performance
 
 1. It didnt improve much for the dataset I work with. 
 2. It may have worked on a larger docs, but I have suspicions since [Is Semantic Chunking Worth the Computational Cost?](https://arxiv.org/pdf/2410.13070) paper couldn't see consistent performance improvements.
@@ -988,7 +988,7 @@ Even if you have a large documents it may still not work because:
 
 
 
-### Why Proposition Models May Not Work
+### Why Proposition Models May Not Improve Performance
 
 Again,
 1. It didnt improve much for the dataset I work with. 
