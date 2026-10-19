@@ -4,9 +4,9 @@ title: Privacy Policy — Room Redesign
 permalink: /apps/room-redesign/privacy/
 ---
 
-Last updated: 19 October 2026.
+Last updated: 20 October 2026.
 
-Room Redesign (“the app”) is made by Mehmet Burak Sayıcı. This page explains what the app stores and who receives it. It covers the iPhone and iPad app. It is not a privacy policy for the rest of this website.
+Room Redesign (“the app”) is made by Mehmet Burak Sayıcı. This page explains what the app stores and who receives it. It covers the iPhone app. It is not a privacy policy for the rest of this website.
 
 Contact: [mburaksayici@gmail.com](mailto:mburaksayici@gmail.com), +90 531 919 54 55.
 
@@ -16,10 +16,6 @@ When you photograph or upload a room, that image and the text you type are sent 
 
 If you dictate instead of typing, the microphone audio is sent to Apple’s speech recognition so it can be turned into text.
 
-## Product search
-
-Searches are sent to our server, then to Serper, a web image-search provider, to find furniture sold by other stores. We show those products and link you to the merchant. The merchant’s own site then applies its own privacy policy. We do not sell the furniture.
-
 ## Account, region, and purchases
 
 The app keeps an install id on your phone so credits and rooms stay with that install. We also store the country and language you confirm, because product search uses them.
@@ -28,13 +24,9 @@ If you use Sign in with Apple, we store the Apple user id and, when Apple provid
 
 Purchases are processed by Apple. We store the product you bought and the transaction id so credits can be granted once and restored. We do not receive your card number. Apple keeps its own record of the purchase.
 
-## Shared designs
-
-If you share a design to the in-app feed, that before-and-after, the style name, a caption, your display name, and your country are visible to other people in that country for that week. Likes and comments on those posts are stored with your account. You can remove your own post. Deleting your account removes the posts, likes, and comments you created.
-
 ## How long we keep it
 
-We keep the account, room photos, designs, and purchase records until you delete the account. In the app, open the account tab and choose delete account. That removes the account, room photos, designs, unused credits, and posts you shared from our server. It cannot be undone. Apple may still keep the purchase in your Apple ID.
+We keep the account, room photos, designs, and purchase records until you delete the account. In the app, open the account tab and choose delete account. That removes the account, room photos, designs, and unused credits from our server. It cannot be undone. Apple may still keep the purchase in your Apple ID.
 
 Signing out of Apple disconnects the Apple ID on our server. Credits stay with the install. Photos saved only on the phone are removed from the phone.
 
