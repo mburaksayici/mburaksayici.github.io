@@ -29,6 +29,10 @@ github_username:  mburaksayici
 linkedin_username: mehmet-burak-sayici-a45294126
 google_analytics: G-516YHVH49S
 
+header_pages:
+  - blog.markdown
+  - apps/index.markdown
+
 # Build settings
 theme: minima
 plugins:
